@@ -17,26 +17,18 @@ using UnityEngine;
 using System.Collections.Generic;
 using Snakybo.RouteSystem;
 
-public class SimpleSpawnSystem : MonoBehaviour {
-	[SerializeField] private GameObject prefab;
+public class DistanceCheckTest : MonoBehaviour {
+	private RouteNodeDetector detector;
 
-	public void SpawnObject()
+	protected void Awake()
 	{
-		Route route = GetRoute();
-		RouteNode routeNode = GetRouteNode(route);
+		detector = GetComponent<RouteNodeDetector>();
 
-		RouteSpawnSystem.Instantiate(prefab, route, routeNode);
+		detector.OnNodeReached += OnNodeReached;
 	}
 
-	private Route GetRoute()
+	private void OnNodeReached(RouteNode node)
 	{
-		List<Route> routes = new List<Route>(RouteManager.Routes);
-
-		return routes[0];
-	}
-
-	private RouteNode GetRouteNode(Route route)
-	{
-		return route.GetRandom();
+		Debug.Log("Reached node: " + node);
 	}
 }

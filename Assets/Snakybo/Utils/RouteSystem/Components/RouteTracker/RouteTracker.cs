@@ -15,28 +15,40 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using Snakybo.RouteSystem;
 
-public class SimpleSpawnSystem : MonoBehaviour {
-	[SerializeField] private GameObject prefab;
-
-	public void SpawnObject()
+namespace Snakybo.RouteSystem
+{
+	public class RouteTracker : RouteComponent
 	{
-		Route route = GetRoute();
-		RouteNode routeNode = GetRouteNode(route);
+		[SerializeField] private List<Object> spawnedObjects;
 
-		RouteSpawnSystem.Instantiate(prefab, route, routeNode);
-	}
+		protected override void Awake()
+		{
+			base.Awake();
 
-	private Route GetRoute()
-	{
-		List<Route> routes = new List<Route>(RouteManager.Routes);
+			spawnedObjects = new List<Object>();
+		}
 
-		return routes[0];
-	}
+		protected void OnEnable()
+		{
+			route.OnObjectAdded += OnObjectAdded;
+			route.OnObjectRemoved += OnObjectRemoved;
+		}
 
-	private RouteNode GetRouteNode(Route route)
-	{
-		return route.GetRandom();
+		protected void OnDisable()
+		{
+			route.OnObjectAdded -= OnObjectAdded;
+			route.OnObjectRemoved -= OnObjectRemoved;
+		}
+
+		private void OnObjectAdded(Object obj)
+		{
+			spawnedObjects.Add(obj);
+        }
+
+		private void OnObjectRemoved(Object obj)
+		{
+			spawnedObjects.Remove(obj);
+		}
 	}
 }

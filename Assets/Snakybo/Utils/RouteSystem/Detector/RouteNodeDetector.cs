@@ -17,41 +17,44 @@ using UnityEngine;
 
 namespace Snakybo.RouteSystem
 {
-	[ExecuteInEditMode]
-	public class RouteNode : MonoBehaviour
+	public class RouteNodeDetector : MonoBehaviour, IRouteData
 	{
-		/// <summary>
-		/// An convenience property to quickly get the position of the node. 
-		/// </summary>
-		public Vector3 Position { get { return transform.position; } }
+		public delegate void OnRouteNodeReachedHandler(RouteNode node);
+		public event OnRouteNodeReachedHandler OnNodeReached = delegate { };
 
-		/// <summary>
-		/// An convenience property to quickly get the rotation of the node.
-		/// </summary>
-		public Quaternion Rotation { get { return transform.rotation; } }
+		[SerializeField] private float maxDistance;
 
-		#region Unity Callbacks
-		protected void Start()
+		private RouteNode lastNode;
+		private Route route;
+
+		public void Update()
 		{
-			if(Application.isPlaying)
+			foreach(RouteNode node in route.RouteNodes)
 			{
-				Destroy(collider);
-			}
-			else
-			{
-				if(collider == null)
+				if(node == lastNode)
+					continue;
+
+				if(Vector3.Distance(transform.position, node.Position) < maxDistance)
 				{
-					BoxCollider boxCollider = gameObject.AddComponent<BoxCollider>();
-					boxCollider.size = new Vector3(1, 0.3f, 1);
+					lastNode = node;
+					OnNodeReached(node);
 				}
 			}
 		}
 
-		protected virtual void OnDrawGizmos()
+		public void OnAddedToRoute(Route route, RouteNode node)
 		{
-			Gizmos.color = Color.green;
-			Gizmos.DrawCube(Position, new Vector3(1, 0.3f, 1));
+			this.route = route;
 		}
-		#endregion
+
+		public void OnRemovedFromRoute(Route route)
+		{
+		}
+
+		protected void OnDrawGizmosSelected()
+		{
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawWireSphere(transform.position, maxDistance);
+		}
 	}
 }

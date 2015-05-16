@@ -13,30 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Snakybo's Route System. If not, see<http://www.gnu.org/licenses/>.
 
-using UnityEngine;
-using System.Collections.Generic;
-using Snakybo.RouteSystem;
-
-public class SimpleSpawnSystem : MonoBehaviour {
-	[SerializeField] private GameObject prefab;
-
-	public void SpawnObject()
+namespace Snakybo.RouteSystem
+{
+	public interface IRouteData
 	{
-		Route route = GetRoute();
-		RouteNode routeNode = GetRouteNode(route);
+		void OnAddedToRoute(Route route, RouteNode node);
 
-		RouteSpawnSystem.Instantiate(prefab, route, routeNode);
-	}
-
-	private Route GetRoute()
-	{
-		List<Route> routes = new List<Route>(RouteManager.Routes);
-
-		return routes[0];
-	}
-
-	private RouteNode GetRouteNode(Route route)
-	{
-		return route.GetRandom();
+		void OnRemovedFromRoute(Route route);
 	}
 }

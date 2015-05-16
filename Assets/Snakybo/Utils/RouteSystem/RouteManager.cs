@@ -20,11 +20,11 @@ namespace Snakybo.RouteSystem
 {
 	public class RouteManager : MonoBehaviour
 	{
-		public delegate void OnRouteRegisteredEvent(Route route);
-		public static event OnRouteRegisteredEvent OnRouteRegistered = delegate {};
+		public delegate void OnRouteRegisteredHandler(Route route);
+		public static event OnRouteRegisteredHandler OnRouteRegistered = delegate {};
 
-		public delegate void OnRouteUnregisteredEvent(Route route);
-		public static event OnRouteUnregisteredEvent OnRouteUnregistered = delegate {};
+		public delegate void OnRouteUnregisteredHandler(Route route);
+		public static event OnRouteUnregisteredHandler OnRouteUnregistered = delegate {};
 
 		private static List<Route> routes;
 

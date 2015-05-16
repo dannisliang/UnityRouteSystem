@@ -16,22 +16,38 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Snakybo.RouteSystem
 {
 	public class Route : MonoBehaviour
 	{
+		public delegate void OnObjectAddedHandler(Object obj);
+		public delegate void OnObjectRemovedHandler(Object obj);
+
+		public event OnObjectAddedHandler OnObjectAdded = delegate { };
+		public event OnObjectRemovedHandler OnObjectRemoved = delegate { };
+
 		[SerializeField] private List<RouteNode> routeNodes;
 		[SerializeField] private bool loop;
 
+		/// <summary>
+		/// Get an enumerable of all nodes in this route.
+		/// </summary>
 		public IEnumerable<RouteNode> RouteNodes {
 			get { return routeNodes; }
 		}
 
+		/// <summary>
+		/// Get the size of this route.
+		/// </summary>
 		public int Size {
 			get { return routeNodes.Count; }
 		}
 
+		/// <summary>
+		/// Whether or not the route is set to loop.
+		/// </summary>
 		public bool Loop {
 			get { return loop; }
 		}
@@ -61,6 +77,34 @@ namespace Snakybo.RouteSystem
 		#endregion
 
 		#region API
+		public void AddObject(Object obj, RouteNode node)
+		{
+			OnObjectAdded(obj);
+
+			Component[] components = (obj as GameObject).GetComponentsInChildren<Component>();
+			foreach(Component component in components)
+			{
+				IRouteData routeData = component as IRouteData;
+
+				if(routeData != null)
+					routeData.OnAddedToRoute(this, node);
+			}
+		}
+
+		public void RemoveObject(Object obj)
+		{
+			OnObjectRemoved(obj);
+
+			Component[] components = (obj as GameObject).GetComponentsInChildren<Component>();
+			foreach(Component component in components)
+			{
+				IRouteData routeData = component as IRouteData;
+
+				if(routeData != null)
+					routeData.OnRemovedFromRoute(this);
+			}
+		}
+
 		public bool AddRouteNode(RouteNode routeNode)
 		{
 			if(Contains(routeNode))
